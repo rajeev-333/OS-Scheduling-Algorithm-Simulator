@@ -2,35 +2,30 @@
 #define PARSER_H_INCLUDED
 
 #include <bits/stdc++.h>
-
 using namespace std;
-
-/** This file handles parsing the data we are going to work with **/
-/** It also holds all the global variables we parse into         **/
-
 
 string operation;
 int last_instant, process_count;
 vector<pair<char, int>> algorithms;
-vector<tuple<string,int,int>> processes;
-vector<vector<char>>timeline;
-unordered_map<string,int>processToIndex;
 
+// Process tuple: (name, arrival, service, deadline)
+vector<tuple<string, int, int, int>> processes;
+unordered_map<string,int> processToIndex;
+vector<int> virtualRuntime;
 
-//Results
+vector<vector<char>> timeline;
 
-vector<int>finishTime;
-vector<int>turnAroundTime;
-vector<float>normTurn;
+vector<int> finishTime;
+vector<int> turnAroundTime;
+vector<float> normTurn;
 
-
-void parse_algorithms(string algorithm_chunk)
-{
+// Parse algorithm list ([algoID]-quantum,...)
+void parse_algorithms(string algorithm_chunk) {
     stringstream stream(algorithm_chunk);
-    while (stream.good())
-    {
+    while (stream.good()) {
         string temp_str;
         getline(stream, temp_str, ',');
+        if (temp_str.empty()) continue;
         stringstream ss(temp_str);
         getline(ss, temp_str, '-');
         char algorithm_id = temp_str[0];
@@ -40,42 +35,76 @@ void parse_algorithms(string algorithm_chunk)
     }
 }
 
-void parse_processes()
-{
-    string process_chunk, process_name;
-    int process_arrival_time, process_service_time;
-    for(int i=0; i<process_count; i++)
-    {
-        cin >> process_chunk;
+// Improved parse_processes function reading entire line per process robustly
+void parse_processes() {
+    string process_line;
+    for (int i = 0; i < process_count; i++) {
+        getline(cin >> ws, process_line);
+        // Trim leading/trailing whitespace
+        size_t start = process_line.find_first_not_of(" \t\r\n");
+        size_t end = process_line.find_last_not_of(" \t\r\n");
+        if (start == string::npos) {
+            cerr << "Error: Empty process line at index " << i << "\n";
+            exit(1);
+        }
+        process_line = process_line.substr(start, end - start + 1);
 
-        stringstream stream(process_chunk);
+        stringstream stream(process_line);
         string temp_str;
-        getline(stream, temp_str, ',');
-        process_name = temp_str;
-        getline(stream, temp_str, ',');
-        process_arrival_time = stoi(temp_str);
-        getline(stream, temp_str, ',');
-        process_service_time = stoi(temp_str);
 
-        processes.push_back( make_tuple(process_name, process_arrival_time, process_service_time) );
+        if (!getline(stream, temp_str, ',')) {
+            cerr << "Error: Missing process name in line: " << process_line << "\n";
+            exit(1);
+        }
+        string process_name = temp_str;
+
+        if (!getline(stream, temp_str, ',')) {
+            cerr << "Error: Missing arrival time in line: " << process_line << "\n";
+            exit(1);
+        }
+        int arrival_time = stoi(temp_str);
+
+        if (!getline(stream, temp_str, ',')) {
+            cerr << "Error: Missing service time in line: " << process_line << "\n";
+            exit(1);
+        }
+        int service_time = stoi(temp_str);
+
+        int deadline = -1;
+        if (getline(stream, temp_str, ',')) {
+            deadline = stoi(temp_str);
+        }
+
+        processes.push_back(make_tuple(process_name, arrival_time, service_time, deadline));
         processToIndex[process_name] = i;
     }
 }
 
-void parse()
-{
+// Updated parse reads entire first line then parses tokens safely
+void parse() {
+    string first_line;
+    getline(cin, first_line);
+    stringstream header_stream(first_line);
+
+    header_stream >> operation;
+
     string algorithm_chunk;
-    cin >> operation >> algorithm_chunk >> last_instant >> process_count;
+    header_stream >> algorithm_chunk;
+
+    header_stream >> last_instant >> process_count;
+
     parse_algorithms(algorithm_chunk);
     parse_processes();
+
     finishTime.resize(process_count);
     turnAroundTime.resize(process_count);
     normTurn.resize(process_count);
     timeline.resize(last_instant);
-    for(int i=0; i<last_instant; i++)
-        for(int j=0; j<process_count; j++)
+    for (int i = 0; i < last_instant; i++)
+        for (int j = 0; j < process_count; j++)
             timeline[i].push_back(' ');
-}
 
+    virtualRuntime.assign(process_count, 0);
+}
 
 #endif // PARSER_H_INCLUDED
