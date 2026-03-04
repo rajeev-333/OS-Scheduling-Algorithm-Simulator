@@ -34,18 +34,20 @@ This simulator supports 10 scheduling algorithms, including advanced schedulers 
 
    * Linux-style fairness scheduling
 
-## Supported Scheduling Algorithms
-ID	 Algorithm
-1	  First Come First Serve (FCFS)
-2	  Round Robin (RR)
-3	  Shortest Process Next (SPN)
-4	  Shortest Remaining Time (SRT)
-5	  Highest Response Ratio Next (HRRN)
-6	  Feedback Queue (FB-1)
-7	  Feedback Queue (FB-2i)
-8	  Aging
-9	  Completely Fair Scheduler (CFS)
-A	  Earliest Deadline First (EDF)
+##  Supported Scheduling Algorithms
+
+| ID | Algorithm |
+| :--- | :--- |
+| 1 | First Come First Serve (FCFS) |
+| 2 | Round Robin (RR) |
+| 3 | Shortest Process Next (SPN) |
+| 4 | Shortest Remaining Time (SRT) |
+| 5 | Highest Response Ratio Next (HRRN) |
+| 6 | Feedback Queue (FB-1) |
+| 7 | Feedback Queue (FB-2i) |
+| 8 | Aging |
+| 9 | Completely Fair Scheduler (CFS) |
+| A | Earliest Deadline First (EDF) |
 ## Input Format
      <MODE> <ALGORITHMS> <LAST_INSTANT> <PROCESS_COUNT>
      <PROCESS_NAME>,<ARRIVAL_TIME>,<SERVICE_TIME>[,<DEADLINE>]
@@ -103,6 +105,16 @@ Displays:
     Starvation Prevention (Aging)
 
     Performance Metrics Calculation
+
+  ##  Project Structure
+
+```text
+OS-Scheduling-Algorithm-Simulator/
+├── main.cpp
+├── parser.h
+├── sample_input.txt
+├── sample_output.txt
+└── README.md
 
 ## Design Highlights
 
