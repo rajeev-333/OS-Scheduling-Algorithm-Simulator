@@ -115,6 +115,7 @@ OS-Scheduling-Algorithm-Simulator/
 ├── sample_input.txt
 ├── sample_output.txt
 └── README.md
+```
 
 ## Design Highlights
 
